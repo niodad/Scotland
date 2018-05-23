@@ -1,0 +1,93 @@
+﻿@model IEnumerable<Schotland.Models.Places>
+
+
+
+@{
+    ViewData["Title"] = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<div id="mapid" style="width: 100%; height: 500px;"></div>
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model.Title)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Info)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Picture)
+
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lat)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model.Lon)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            var imgSrc = "";
+            if (item.Picture != null)
+            {
+                var base64 = Convert.ToBase64String(item.Picture);
+                imgSrc = String.Format("data:image/gif;base64,{0}", base64);
+            }
+
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Title)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Info)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lat)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Lon)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id">Edit</a> |
+                    <a asp-action="Details" asp-route-id="@item.Id">Details</a> |
+                    <a asp-action="Delete" asp-route-id="@item.Id">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+
+    <script type="text/javascript">
+    var map = L.map('mapid', {
+        center: [56.7968571, -5.00355049999996],
+        zoom: 7
+    });
+
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png?{foo}', { foo: 'bar' }).addTo(map);
+
+
+    function addMarker(latitude, longitude, title, description, map)
+    {
+        L.marker([latitude, longitude]).addTo(map).bindPopup("<h3>" + title + "</h3><p>" + description + "</p>");
+    }
+
+    // Now add markers
+    @foreach (var item in Model) {
+        @:addMarker('@item.Lat', '@item.Lon', '@item.Title', '@item.Info', map);
+    }
+    </script>
+
+}
+
